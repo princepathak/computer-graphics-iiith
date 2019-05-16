@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Learning D3</title>
+	<style>
+		rect.bordered {
+			stroke: rgb(77, 3, 3);
+			stroke-width: 2px;
+		}
+
+		text.mono {
+			font-size: 9pt;
+			font-family: Consolas, courier;
+			fill: #aaa;
+		}
+
+		text.axis-workweek {
+			fill: #000;
+		}
+
+		text.axis-worktime {
+			fill: rgb(0, 0, 0);
+		}
+	</style>
+	<script src="http://d3js.org/d3.v3.js"></script>
+</head>
+
+<body>
+	<div id="chart">
+
+	</div>
+	<div id="dataset-picker" posit>
+		<span>X0</span><input type="number" value="2" id="x1" name="x1">
+		<span>Y0</span><input type="number" value="2" id="y1" nam="y1"><br>
+		<span>X1</span><input type="number" value="10" id="x2" name="x2">
+		<span>Y1</span><input type="number" value="10" id="y2" name="y2">
+		<button type="submit" onclick="datapicker(x1.value,y1.value,x2.value,y2.value)" >Submit</button>>
+	</div>
+
+	<script>
+		var gridSize;
+		var margin = { top: 50, right: 0, bottom: 100, left: 30 },
+			width = 960 - margin.left - margin.right,
+			height = 600 - margin.top - margin.bottom,
+			X = [],
+			Y = [],
+			colors = ["#ffffd9", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#253494", "#081d58"],
+			yAxis = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"],
+			xAxis = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"],
+
+			coordinates = [],
+			table = [];
+
+
+
+
+		var generateXY = function (x1, y1, x2, y2) {//generating the range of coordinates in the axes
+			var Xmin = Math.min(x1, x2);
+			var Xmax = Math.max(x1, x2);
+			var Ymin = Math.min(y1, y2);
+			var Ymax = Math.max(y1, y2);
+			gridSize = Math.floor(width /40);
+			var i, j, k = 1, l;
+			for (i = Xmin-2; i <= Xmax+2 && i>=0; i++) {
+				X.push(i);
+			}
+			for (i = Ymax+2; i >= Ymin-2 && i>=0 ; i--) {
+				Y.push(i);
+			}
+			for (i = Ymax+2; i >= Ymin-2 && i>=0 ; i--) {
+				l = 1;
+				for (j = Xmin-2; j <= Xmax+2 && j>=0; j++) {
+					table.push({ y: i, x: j, yI: k, xI: l });
+					l += 1;
+				}
+				k += 1;
+			}
+		}
+		//generateXY(2,2,10,10);
+		var bressanhem = function (x1, y1, x2, y2) {//creating a dataset of the pixels chosen
+			if (x1 > x2) {
+				var temp = x1;
+				x1 = x2;
+				x2 = temp;
+				temp = y1;
+				y1 = y2;
+				y2 = temp;
+			}
+			var dy = Math.abs(y2 - y1);
+			var dx = Math.abs(x2 - x1);
+			var err = 2 * dy - dx;
+			var coord = {
+				x: x1,
+				y: y1
+			};
+			var x=x1,y=y1;
+			coordinates[0]={};
+			coordinates[0].x=x;
+			coordinates[0].y=y;
+			for (i = 1; i <=dx; i++) {
+				if (err < 0) {
+					err += 2 * dy;
+					x+=1;
+					coordinates[i]={};
+					coordinates[i].x=x;
+					coordinates[i].y=y;
+				}
+				else {
+					err += 2 * dy - 2 * dx;
+					//err-=2*dx;
+					x+=1;
+					y+=1;
+					coordinates[i]={};
+					coordinates[i].x=x;
+					coordinates[i].y=y;
+				}
+			}
+		}
+		function bressanhem2(x1, y1, x2, y2){
+			var dy = Math.abs(y2 - y1);
+			var dx = Math.abs(x2 - x1);
+			if(dx!=0){
+				var derr =Math.abs(dy/dx);
+			}
+			var error=0.0,j=0;
+			y=y1;
+			for(var i=x1;i<=x2;i++){
+				coordinates[j]={};
+				coordinates[j].x=i;
+				coordinates[j].y=y;
+				error+=derr;
+				if(error>0.5){
+					y+=dy*1;
+					error-=1;
+				}
+				j+=1;
+			}			
+		}
+		//bressanhem(2,2,10,10);
+		
+		function datapicker(x1,y1,x2,y2){
+			generateXY(x1, y1, x2, y2);
+			bressanhem(x1, y1, x2, y2);
+
+			var svg = d3.select("#chart").append("svg")
+			.attr("width", width + margin.left + margin.right)
+			.attr("height", height + margin.top + margin.bottom)
+			.append("g")
+			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+		var YLabels = svg.selectAll(".yLabel")
+			.data(Y)
+			.enter().append("text")
+			.text(function (d) { return d; })
+			.attr("x", 0)
+			.attr("y", function (d, i) { return i * gridSize; })
+			.style("text-anchor", "end")
+			.attr("transform", "translate(-6," + gridSize / 1.5 + ")")
+			.attr("class", function (d, i) { return ((i >= 0 && i <= 4) ? "yLabel mono axis axis-workweek" : "yLabel mono axis"); });
+
+		var XLabels = svg.selectAll(".xLabel")
+			.data(X)
+			.enter().append("text")
+			.text(function (d) { return d; })
+			.attr("x", function (d, i) { return i * gridSize; })
+			.attr("y", 0)
+			.style("text-anchor", "middle")
+			.attr("transform", "translate(" + gridSize / 2 + ", -6)")
+			.attr("class", function (d, i) { return ((i >= 7 && i <= 16) ? "xLabel mono axis axis-worktime" : "txLabel mono axis"); });
+
+		var initialChart = svg.selectAll(".grid")
+			.data(table)
+			.enter().append("rect")
+			.attr("x", function (d) { return (d.xI - 1) * gridSize; })
+			.attr("y", function (d) { return (d.yI - 1) * gridSize; })
+			.attr("class", "grid bordered")
+			.attr("rx", 4)
+			.attr("ry", 4)
+			.attr("width", gridSize)
+			.attr("height", gridSize)
+			.style("fill", colors[0])
+			.attr("id", function (d) {
+				return "grid-" + d.x + "-" + d.y;
+			});
+
+		var line = svg
+			.append("line")
+			.attr("stroke", "blue")
+			.attr("x1", document.getElementById("grid-"+x1+"-"+y1).x+11.5)
+			.attr("y1", document.getElementById("grid-"+x1+"-"+y1).y+11.5)
+			.attr("x2", document.getElementById("grid-"+x2+"-"+y2).x+11.5)
+			.attr("y2", document.getElementById("grid-"+x2+"-"+y2).y+11.5)
+			.attr("height", 20)
+			.attr("width", 10);
+
+		coordinates.forEach(myFunction); 
+			function myFunction(item, index) 
+			{ 
+				document.getElementById("grid-"+item.x+"-"+item.y).style.fill = colors[5];
+				document.write(item.x+" "+item.y+", ");
+			}
+		}
+		datapicker(3,2,15,5);			
+	</script>
+</body>
+
+</html>
