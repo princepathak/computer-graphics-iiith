@@ -1,6 +1,3 @@
-document.getElementById("submit").addEventListener("click", datapicker, true);
-document.getElementById("previous").addEventListener("click", previousStep);
-document.getElementById("next").addEventListener("click", nextStep);
 
 var margin = { top: 50, right:10, bottom: 100, left: 30 },
     width = 700 - margin.left - margin.right,
@@ -42,7 +39,7 @@ var generateXY = function (x1, y1, x2, y2) {//generating the range of coordinate
     var Ymax = Math.max(y1, y2);
 
     var gridsize = Math.floor(width / 30);
-    var X = [], Y = [], temp_table = [];
+    var X = [], Y = [], tempTable = [];
     var i, j, k = 1, l;
     for (i = Xmin - 2; i <= Xmax + 2; i++) {
         X.push(i);
@@ -53,7 +50,7 @@ var generateXY = function (x1, y1, x2, y2) {//generating the range of coordinate
     for (i = Ymax + 2; i >= Ymin - 2; i--) {
         l = 1;
         for (j = Xmin - 2; j <= Xmax + 2; j++) {
-            temp_table.push({ y: i, x: j, yI: k, xI: l });
+            tempTable.push({ y: i, x: j, yI: k, xI: l });
             l += 1;
         }
         k += 1;
@@ -61,21 +58,21 @@ var generateXY = function (x1, y1, x2, y2) {//generating the range of coordinate
     return {
         x: X,
         y: Y,
-        table: temp_table,
+        table: tempTable,
         gridSize: gridsize
     };
 }
 
 function plotLineHigh(x0, y0, x1, y1) {
-    var dx = x1 - x0;
-    var dy = y1 - y0;
+    var dx = x1 - x0; // Difference of abscissa.
+    var dy = y1 - y0; // Difference of ordinates.
     var xi = 1;
     if (dx < 0) {
         xi = -1;
         dx = -dx;
     }
-    var coordinates = [];
-    var D = 2 * dx - dy
+    var coordinates = []; // It will store the the pixel to be chosen to form the line
+    var D = 2 * dx - dy;  // D represents error;
     var x = x0, i = 0, y;
 
     for (y = y0; y <= y1; y++) {
@@ -151,19 +148,19 @@ function previousStep() {
 }
 function datapicker() {
     step = -1;
-    var x1 = parseInt(document.getElementById("x1").value);
-    var x2 = parseInt(document.getElementById("x2").value);
+    var x1 = parseInt(document.getElementById("x1").value,10);
+    var x2 = parseInt(document.getElementById("x2").value,10);
 
-    var y1 = parseInt(document.getElementById("y1").value);
-    var y2 = parseInt(document.getElementById("y2").value);
+    var y1 = parseInt(document.getElementById("y1").value,10);
+    var y2 = parseInt(document.getElementById("y2").value,10);
 
     if(Math.abs(y2-y1)>=22){
         alert("Y values are out of range:\n Try enter y values with difference of less than 20");
-        return
+        return;
     }
     if(Math.abs(x2-x1)>=25){
         alert("X values are out of range:\n Try enter x values with difference of less than 25");
-        return
+        return;
     }
 
     var data = generateXY(x1, y1, x2, y2);
@@ -232,3 +229,6 @@ function datapicker() {
 
 }
 datapicker();
+document.getElementById("submit").addEventListener("click", datapicker, true);
+document.getElementById("previous").addEventListener("click", previousStep);
+document.getElementById("next").addEventListener("click", nextStep);
