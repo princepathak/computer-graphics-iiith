@@ -4,10 +4,6 @@
 	<meta charset="utf-8">
 	<title>Learning D3</title>
 	<style>
-		svg{
-			vertical-align:middle;
-			float:middle;
-		}
 		rect.bordered {
 			stroke: rgb(77, 3, 3);
 			stroke-width: 2px;
@@ -34,45 +30,71 @@
 	<div id="chart" style="float:left">
 
 	</div>
-	<div id="dataset-picker" style="float:right;margin-top:100px" >
+	<div id="dataset-picker" style="float:right;" >
 		<span>X0</span><input type="number" value="2" id="x1" name="x1">
 		<span>Y0</span><input type="number" value="2" id="y1" name="y1"><br>
 		<span>X1</span><input type="number" value="10" id="x2" name="x2">
 		<span>Y1</span><input type="number" value="10" id="y2" name="y2"><br>
-		<button type="button" id="submit" value="Run the Experiment" onclick="datapicker" >Run the Experiment</button><br>
+		<button type="button" id="submit">Run the Experiment</button><br>
 		<button id="previous" type="button" >Previous</button>
 		<button id="next" type="button" >Next</button>
 	</div>
 
 	<script>
-		document.getElementById("submit").addEventListener("click",datapicker,false);
+		document.getElementById("submit").addEventListener("click",temp,false);
 		document.getElementById("previous").addEventListener("click", previousStep,false);
 		document.getElementById("next").addEventListener("click", nextStep,false);
 
-		var margin = { top: 50, right: 0, bottom: 0, left: 30 },
-			width = 800 - margin.left - margin.right,
+		var margin = { top: 50, right: 0, bottom: 100, left: 30 },
+			width = 960 - margin.left - margin.right,
 			height = 600 - margin.top - margin.bottom,
 			colors = ["#ffffd9", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#253494", "#081d58"],
 			Coordinates,
 			step=-1;
 
+		function plotLineLow(x0,y0, x1,y1){
+			var dx = x1 - x0;
+			var dy = y1 - y0;
+			var yi = 1;
+			if(dy < 0){
+				yi = -1;
+				dy = -dy;
+			}
+			var coordinates=[];
+			var D = 2*dy - dx;
+			var y = y0,x,i=0;
+
+			for(x=x0;x<=x1;x++){
+				coordinates[i]={};
+				coordinates[i].x=x;
+				coordinates[i].y=y;
+				if(D > 0){
+					y = y + yi;
+					D = D - 2*dx;
+				}
+				D = D + 2*dy;
+				i++;
+			}
+			return coordinates;
+		
+		}
 		var generateXY = function (x1, y1, x2, y2) {//generating the range of coordinates in the axes
 			var Xmin = Math.min(x1, x2);
 			var Xmax = Math.max(x1, x2);
 			var Ymin = Math.min(y1, y2);
 			var Ymax = Math.max(y1, y2);
-			var gridsize = Math.floor(height/Math.max((Ymax-Ymin+6),(Xmax-Xmin+6)));
+			var gridsize = Math.floor(width /40);
 			var X=[],Y=[],temp_table=[];
 			var i, j, k = 1, l;
-			for (i = Xmin-2; i <= Xmax+2 && i>=0; i++) {
+			for (i = Xmin-2; i <= Xmax+2 ; i++) {
 				X.push(i);
 			}
-			for (i = Ymax+2; i >= Ymin-2 && i>=0 ; i--) {
+			for (i = Ymax+2; i >= Ymin-2; i--) {
 				Y.push(i);
 			}
-			for (i = Ymax+2; i >= Ymin-2 && i>=0 ; i--) {
+			for (i = Ymax+2; i >= Ymin-2; i--) {
 				l = 1;
-				for (j = Xmin-2; j <= Xmax+2 && j>=0; j++) {
+				for (j = Xmin-2; j <= Xmax+2; j++) {
 					temp_table.push({ y: i, x: j, yI: k, xI: l });
 					l += 1;
 				}
@@ -85,9 +107,36 @@
 				gridSize:gridsize
 			};
 		}
+		
+		function plotLineHigh(x0,y0, x1,y1){
+				var dx = x1 - x0;
+				var dy = y1 - y0;
+				var xi = 1;
+				if(dx < 0){
+					xi = -1;
+					dx = -dx;
+				}
+				var coordinates=[];
+				var D = 2*dx - dy
+				var x = x0,i=0,y;
+
+			for(y=y0;y<=y1;y++){
+				coordinates[i]={};
+				coordinates[i].x=x;
+				coordinates[i].y=y;
+				if(D > 0){
+					x = x + xi;
+					D = D - 2*dy;
+				}
+				D = D + 2*dx;
+				i++;
+			}
+			return coordinates;
+			}
+  
 		//generateXY(2,2,10,10);
 		var bressanhem = function (x1, y1, x2, y2) {//creating a dataset of the pixels chosen
-			if(x1 < x2){
+			if(x1 > x2){
 				var temp = x1;
 				x1 = x2;
 				x2 = temp;
@@ -124,34 +173,34 @@
 					coordinates[i].x=x;
 					coordinates[i].y=y;
 				}
-				//document.write(coordinates[i].x+" "+coordinates[i].y+", ");
+				document.write(coordinates[i].x+" "+coordinates[i].y+", ");
 			}
 			return coordinates;
 		}
 		function bressanhem2(x1, y1, x2, y2){
-			var dy = Math.abs(y2 - y1);
-			var dx = Math.abs(x2 - x1);
-			if(dx!=0){
-				var derr =Math.abs(dy/dx);
-			}
-			var error=0.0,j=0;
-			y=y1;
-			for(var i=x1;i<=x2;i++){
-				coordinates[j]={};
-				coordinates[j].x=i;
-				coordinates[j].y=y;
-				error+=derr;
-				if(error>0.5){
-					y+=dy*1;
-					error-=1;
+			var coordinates;
+			if(Math.abs(y2-y1)<Math.abs(x2-x1)){
+				if(x1>x2){
+					coordinates=plotLineLow(x2,y2,x1,y1);
 				}
-				j+=1;
-			}			
+				else{
+					coordinates=plotLineLow(x1,y1,x2,y2);
+				}
+			}
+			else{
+				if(y1>y2){
+					coordinates=plotLineHigh(x2,y2,x1,y1);
+				}
+				else{
+					coordinates=plotLineHigh(x1,y1,x2,y2);
+				}
+			}
+			return coordinates;
 		}
 		//bressanhem(2,2,10,10);
 
 		function nextStep(){
-			if(step==Coordinates.length){
+			if(step===Coordinates.length){
 				alert("Experiment Complete");
 				return
 			}
@@ -170,7 +219,7 @@
 		}
 
 		function previousStep(){
-			if(step<0){
+			if(step < 0){
 				alert("Experiment has not started yet!");
 				return
 			}
@@ -187,23 +236,32 @@
 			}
 		}
 		function datapicker(){
-			var x1=document.getElementById("x1").value;
-			var x2=document.getElementById("x2").value;
+			var x1=parseInt(document.getElementById("x1").value);
+			var x2=parseInt(document.getElementById("x2").value);
 			
-			var y1=document.getElementById("y1").value;
-			var y2=document.getElementById("y2").value;
+			var y1=parseInt(document.getElementById("y1").value);
+			var y2=parseInt(document.getElementById("y2").value);
+			
 			var data=generateXY(x1, y1, x2, y2);
-			Coordinates=bressanhem(x1, y1, x2, y2);
+			Coordinates=bressanhem2(x1, y1, x2, y2);
 			var gridSize=data.gridSize;
+			document.write(Coordinates[0].x+" "+Coordinates[0].y);
 
+			var prevSvg = document.getElementById("svg");
+			
+			if(prevSvg !== null){
+				var parent = prevSvg.parentNode;
+				parent.removeChild(prevSvg);
+			}
 			
 
 			var svg = d3.select("#chart").append("svg")
+			.attr("id","svg")
 			.attr("width", width + margin.left + margin.right)
 			.attr("height", height + margin.top + margin.bottom)
 			.append("g")
 			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-			//document.write("hello");
+			document.write("hello");
 		var YLabels = svg.selectAll(".yLabel")
 			.data(data.y)
 			.enter().append("text")
@@ -213,7 +271,7 @@
 			.style("text-anchor", "end")
 			.attr("transform", "translate(-6," + gridSize / 1.5 + ")")
 			.attr("class", function (d, i) { return ((i >= 0 && i <= 4) ? "yLabel mono axis axis-workweek" : "yLabel mono axis"); });
-			//document.write("hello");
+			document.write("hello");
 		var XLabels = svg.selectAll(".xLabel")
 			.data(data.x)
 			.enter().append("text")
@@ -224,7 +282,7 @@
 			.attr("transform", "translate(" + gridSize / 2 + ", -6)")
 			.attr("class", function (d, i) { return ((i >= 7 && i <= 16) ? "xLabel mono axis axis-worktime" : "txLabel mono axis"); });
 			
-			//document.write("hello");
+			document.write("hello");
 		var initialChart = svg.selectAll(".grid")
 			.data(data.table)
 			.enter().append("rect")
@@ -240,7 +298,7 @@
 				return "grid-" + d.x + "-" + d.y;
 			});
 			
-			//document.write(data.x.indexOf(x2));
+			document.write(data.x.indexOf(x2));
 			var line = svg
 			.append("line")
 			.attr("stroke", "black")
@@ -251,20 +309,13 @@
 			.attr("height", 20)
 			.attr("width", 10);
 
-			
-		
+		}
+		function temp(){
+			datapicker();
 		}
 		
 		datapicker();
-		// document.getElementById("grid-"+Coordinates[step].x+"-"+Coordinates[step].y).style.fill = colors[5];
-		// Coordinates.forEach(myFunction); 
-		// 	function myFunction(item, index) 
-		// 	{ 
-		// 		document.getElementById("grid-"+item.x+"-"+item.y).style.fill = colors[5];
-		// 		document.write(item.x+" "+item.y+", ");
-		// 	}	
-				
 	</script>
 </body>
 
-</html>	
+</html>
