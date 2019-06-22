@@ -1,10 +1,10 @@
 
-var margin = { top: 50, right:10, bottom: 100, left: 30 },
-    width = 700 - margin.left - margin.right,
+var margin = { top: 30, right:10, bottom: 100, left: 30 },
+    width = Math.min(parseInt(document.getElementById("chart").offsetWidth,10),700),
     height = 625 - margin.top - margin.bottom,
     colors = ["#ffffd9", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#253494", "#081d58"],
-    Coordinates,
-    step = -1;
+    Coordinates, // Stores the final list of chosen pixels.
+    step = -1; //Step Variable keeps the record of the current step of the experiment.
 
 function plotLineLow(x0, y0, x1, y1) {
     var dx = x1 - x0;
@@ -14,8 +14,8 @@ function plotLineLow(x0, y0, x1, y1) {
         yi = -1;
         dy = -dy;
     }
-    var coordinates = [];
-    var D = 2 * dy - dx;
+    var coordinates = []; // It stores the chosen pixels or coordinates.
+    var D = 2 * dy - dx; //D represents the error.
     var y = y0, x, i = 0;
 
     for (x = x0; x <= x1; x++) {
@@ -41,15 +41,15 @@ var generateXY = function (x1, y1, x2, y2) {//generating the range of coordinate
     var gridsize = Math.floor(width / 30);
     var X = [], Y = [], tempTable = [];
     var i, j, k = 1, l;
-    for (i = Xmin - 2; i <= Xmax + 2; i++) {
+    for (i = Xmin - 1; i <= Xmax + 1; i++) {
         X.push(i);
     }
-    for (i = Ymax + 2; i >= Ymin - 2; i--) {
+    for (i = Ymax + 1; i >= Ymin - 1; i--) {
         Y.push(i);
     }
-    for (i = Ymax + 2; i >= Ymin - 2; i--) {
+    for (i = Ymax + 1; i >= Ymin - 1; i--) {
         l = 1;
-        for (j = Xmin - 2; j <= Xmax + 2; j++) {
+        for (j = Xmin - 1; j <= Xmax + 1; j++) {
             tempTable.push({ y: i, x: j, yI: k, xI: l });
             l += 1;
         }
@@ -91,7 +91,7 @@ function plotLineHigh(x0, y0, x1, y1) {
 
 function bressanhem(x1, y1, x2, y2) {
     var coordinates;
-    if (Math.abs(y2 - y1) < Math.abs(x2 - x1)) {
+    if (Math.abs(y2 - y1) < Math.abs(x2 - x1)) {//slope is between -1 to 1
         if (x1 > x2) {
             coordinates = plotLineLow(x2, y2, x1, y1);
         }
@@ -99,7 +99,7 @@ function bressanhem(x1, y1, x2, y2) {
             coordinates = plotLineLow(x1, y1, x2, y2);
         }
     }
-    else {
+    else { // slope is beyond -1 and 1
         if (y1 > y2) {
             coordinates = plotLineHigh(x2, y2, x1, y1);
         }
@@ -107,7 +107,7 @@ function bressanhem(x1, y1, x2, y2) {
             coordinates = plotLineHigh(x1, y1, x2, y2);
         }
     }
-    return coordinates;
+    return coordinates; // returning the list of coordinates or pixels
 }
 
 function nextStep() {
@@ -116,7 +116,7 @@ function nextStep() {
         return
     }
     else if (step < 0) {
-        step = 0;
+        step = 0; // to prevent abnormal behaviour of next button
     }
 
     var grid = document.getElementById("grid-" + Coordinates[step].x + "-" + Coordinates[step].y);
@@ -135,7 +135,7 @@ function previousStep() {
         return
     }
     else if (step >= Coordinates.length) {
-        step = Coordinates.length - 1;
+        step = Coordinates.length - 1;  //to prevent abnormal behaviour of previous button
     }
     var grid1 = document.getElementById("grid-" + Coordinates[step].x + "-" + Coordinates[step].y);
     if (grid1) {
@@ -154,7 +154,7 @@ function datapicker() {
     var y1 = parseInt(document.getElementById("y1").value,10);
     var y2 = parseInt(document.getElementById("y2").value,10);
 
-    if(Math.abs(y2-y1)>=22){
+    if(Math.abs(y2-y1)>=25){
         alert("Y values are out of range:\n Try enter y values with difference of less than 20");
         return;
     }
@@ -176,8 +176,8 @@ function datapicker() {
 
     var svg = d3.select("#chart").append("svg")
         .attr("id", "svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("width", "100%")
+        .attr("height", height+margin.top+margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 

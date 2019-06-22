@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Rasterization: Line</title>
+    <script src="http://d3js.org/d3.v3.js"></script>
+    <link href="Bresenhem.css" rel="stylesheet">
+</head>
+
+<body>
+	<div class="wrapper">
+	<div class="chart" id="chart">
+
+	</div>
+	<div class="data" id="dataset-picker">
+		<table>
+			<tr>
+				<td>X0</td>
+				<td><input type="number" value="2" id="x1" name="x1" onchange="datapicker()"></td>
+			</tr>
+			<tr>
+				<td>Y0</td>
+				<td><input type="number" value="2" id="y1" name="y1" onchange="datapicker()"></td>
+			</tr>
+			<tr>
+				<td>X1</td>
+				<td><input type="number" value="10" id="x2" name="x2" onchange="datapicker()"></td>
+			</tr>
+			<tr>
+				<td>Y1</td>
+				<td><input type="number" value="10" id="y2" name="y2" onchange="datapicker()"></td>
+			</tr>			
+			<tr>
+				<td colspan="2"><button type="button" id="submit">Run the Experiment</button></td>
+			</tr>
+			<tr>
+				<td><button id="previous" type="button" >Previous</button></td>
+				<td><button id="next" type="button" >Next</button></td>
+			</tr>
+		</table>
+	</div>
+	</div>
+    <script src="Bresenhem.js"></script>
+</body>
+</html>

@@ -2,6 +2,7 @@ rect.bordered {
   stroke: rgb(77, 3, 3);
   stroke-width: 2px;
 }
+
 text.mono {
   font-size: 9pt;
   font-family: Consolas, courier;
@@ -10,12 +11,27 @@ text.mono {
 
 .wrapper {
   display: grid;
-  grid-template-columns: 85% 15%;
-  grid-gap: 1em;
+  grid-template-columns: 75% 25%;
+  
   grid-auto-rows: minmax(100px,auto)
 }
 
 .data {
   justify-self: center;
   align-self: center;
+}
+
+td{
+  text-align: center;
+}
+
+button{
+  width: 100%;
+  background-color: white;
+  color: black;
+  border: 2px solid #e7e7e7;
+}
+
+button:hover {
+  background-color: #e7e7e7;
 }
