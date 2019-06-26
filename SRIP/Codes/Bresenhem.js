@@ -1,10 +1,12 @@
 
 var margin = { top: 30, right:10, bottom: 100, left: 30 },
     width = Math.min(parseInt(document.getElementById("chart").offsetWidth,10),700),
-    height = 625 - margin.top - margin.bottom,
+    height = 650 - margin.top - margin.bottom,
     colors = ["#ffffd9", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#253494", "#081d58"],
     Coordinates, // Stores the final list of chosen pixels.
-    step = -1; //Step Variable keeps the record of the current step of the experiment.
+    step = -1, //Step Variable keeps the record of the current step of the experiment.
+    X0,X1,Y0,Y1,svg,data;
+    var gridSize,frameWidth,frameHeight;
 
 function plotLineLow(x0, y0, x1, y1) {
     var dx = x1 - x0;
@@ -37,19 +39,39 @@ var generateXY = function (x1, y1, x2, y2) {//generating the range of coordinate
     var Xmax = Math.max(x1, x2);
     var Ymin = Math.min(y1, y2);
     var Ymax = Math.max(y1, y2);
-
+    var temp=0
+    while(Xmax-Xmin < frameWidth){
+        if(temp == 0){
+            Xmax++;
+            temp=1;
+        }
+        else{
+            Xmin--;
+            temp=0;
+        }
+    }
+    while(Ymax-Ymin < frameHeight){
+        if(temp == 0){
+            Ymax++;
+            temp=1;
+        }
+        else{
+            Ymin--;
+            temp=0;
+        }
+    }
     var gridsize = Math.floor(width / 30);
     var X = [], Y = [], tempTable = [];
     var i, j, k = 1, l;
-    for (i = Xmin - 1; i <= Xmax + 1; i++) {
+    for (i = Xmin; i <= Xmax; i++) {
         X.push(i);
     }
-    for (i = Ymax + 1; i >= Ymin - 1; i--) {
+    for (i = Ymax; i >= Ymin; i--) {
         Y.push(i);
     }
-    for (i = Ymax + 1; i >= Ymin - 1; i--) {
+    for (i = Ymax; i >= Ymin; i--) {
         l = 1;
-        for (j = Xmin - 1; j <= Xmax + 1; j++) {
+        for (j = Xmin; j <= Xmax; j++) {
             tempTable.push({ y: i, x: j, yI: k, xI: l });
             l += 1;
         }
@@ -146,26 +168,32 @@ function previousStep() {
         alert("Null");
     }
 }
-function datapicker() {
-    step = -1;
-    var x1 = parseInt(document.getElementById("x1").value,10);
-    var x2 = parseInt(document.getElementById("x2").value,10);
+function frameCreator(){
+    frameWidth = parseInt(document.getElementById("frameWidth").value,10);
+    frameHeight = parseInt(document.getElementById("frameHeight").value,10);
+    drawGraph();
+}
+function datapicker(){
+    var x1 = X0 = parseInt(document.getElementById("x1").value,10);
+    var x2 = X1 = parseInt(document.getElementById("x2").value,10);
+    var y1 = Y0 = parseInt(document.getElementById("y1").value,10);
+    var y2 = Y1 = parseInt(document.getElementById("y2").value,10);
 
-    var y1 = parseInt(document.getElementById("y1").value,10);
-    var y2 = parseInt(document.getElementById("y2").value,10);
-
-    if(Math.abs(y2-y1)>=25){
-        alert("Y values are out of range:\n Try enter y values with difference of less than 20");
+    if(Math.abs(y2 - y1) > frameHeight){
+        alert("Y values are out of range:\n Try enter y values with difference of less than 25");
         return;
     }
-    if(Math.abs(x2-x1)>=25){
+    if(Math.abs(x2 - x1) > frameWidth){
         alert("X values are out of range:\n Try enter x values with difference of less than 25");
         return;
     }
-
-    var data = generateXY(x1, y1, x2, y2);
-    Coordinates = bressanhem(x1, y1, x2, y2);
-    var gridSize = data.gridSize;
+}
+function drawGraph() {
+    step = -1;
+    datapicker();
+    
+    data = generateXY(X0, Y0, X1, Y1);
+    gridSize = data.gridSize;
 
     var prevSvg = document.getElementById("svg");
 
@@ -174,8 +202,9 @@ function datapicker() {
         parent.removeChild(prevSvg);
     }
 
-    var svg = d3.select("#chart").append("svg")
+    svg = d3.select("#chart").append("svg")
         .attr("id", "svg")
+        .attr("margin-left",100)
         .attr("width", "100%")
         .attr("height", height+margin.top+margin.bottom)
         .append("g")
@@ -204,8 +233,8 @@ function datapicker() {
     var initialChart = svg.selectAll(".grid")
         .data(data.table)
         .enter().append("rect")
-        .attr("x", function (d) { return (d.xI - 1) * gridSize; })
-        .attr("y", function (d) { return (d.yI - 1) * gridSize; })
+        .attr("x", function (d) { return (d.xI-1) * gridSize; })
+        .attr("y", function (d) { return (d.yI-1) * gridSize; })
         .attr("class", "grid bordered")
         //.attr("rx", 4)
         //.attr("ry", 4)
@@ -215,20 +244,46 @@ function datapicker() {
         .attr("id", function (d) {
             return "grid-" + d.x + "-" + d.y;
         });
-
+}
+function drawLine(){
     var line = svg
         .append("line")
+        .attr("id","line")
         .attr("stroke", "black")
-        .attr("stroke-width",3)
-        .attr("x1", data.x.indexOf(x1) * gridSize + gridSize / 2)
-        .attr("y1", data.y.indexOf(y1) * gridSize + gridSize / 2)
-        .attr("x2", data.x.indexOf(x2) * gridSize + gridSize / 2)
-        .attr("y2", data.y.indexOf(y2) * gridSize + gridSize / 2)
+        .attr("stroke-width",2)
+        .attr("x1", data.x.indexOf(X0) * gridSize + gridSize / 2)
+        .attr("y1", data.y.indexOf(Y0) * gridSize + gridSize / 2)
+        .attr("x2", data.x.indexOf(X1) * gridSize + gridSize / 2)
+        .attr("y2", data.y.indexOf(Y1) * gridSize + gridSize / 2)
         .attr("height", 20)
         .attr("width", 10);
 
+    var circle1 = svg
+        .append("circle")
+        .attr("id","line")
+        .style("fill", "red")
+        .attr("cx", data.x.indexOf(X0) * gridSize + gridSize / 2)
+        .attr("cy", data.y.indexOf(Y0) * gridSize + gridSize / 2)
+        .attr("height", 20)
+        .attr("width", 10)
+        .attr("r", 3);
+    
+    var circle1 = svg
+        .append("circle")
+        .attr("id","line")
+        .style("fill", "red")
+        .attr("cx", data.x.indexOf(X1) * gridSize + gridSize / 2)
+        .attr("cy", data.y.indexOf(Y1) * gridSize + gridSize / 2)
+        .attr("height", 20)
+        .attr("width", 10)
+        .attr("r", 3);    
 }
-datapicker();
-document.getElementById("submit").addEventListener("click", datapicker, true);
+function experiment(){
+    drawGraph();
+    drawLine();
+    Coordinates = bressanhem(X0, Y0, X1, Y1);
+}
+frameCreator();
+document.getElementById("submit").addEventListener("click", experiment, true);
 document.getElementById("previous").addEventListener("click", previousStep);
 document.getElementById("next").addEventListener("click", nextStep);

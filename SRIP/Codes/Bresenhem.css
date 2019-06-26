@@ -13,9 +13,12 @@ text.mono {
   display: grid;
   grid-template-columns: 75% 25%;
   
-  grid-auto-rows: minmax(100px,auto)
+  grid-auto-rows: minmax(100px,auto);
 }
 
+.chart{
+  padding-left:100 
+}
 .data {
   justify-self: center;
   align-self: center;
