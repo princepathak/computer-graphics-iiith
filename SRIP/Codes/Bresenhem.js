@@ -169,9 +169,17 @@ function previousStep() {
     }
 }
 function frameCreator(){
-    frameWidth = parseInt(document.getElementById("frameWidth").value,10);
-    frameHeight = parseInt(document.getElementById("frameHeight").value,10);
-    drawGraph();
+    var a,b;   
+    a = parseInt(document.getElementById("frameWidth").value,10);
+    b = parseInt(document.getElementById("frameHeight").value,10);
+    if(a<=25 && a>=15){
+        if(b<=25 && b>=15){
+            frameWidth=a;
+            frameHeight=b;
+            drawGraph();
+        }
+    }
+    
 }
 function datapicker(){
     var x1 = X0 = parseInt(document.getElementById("x1").value,10);

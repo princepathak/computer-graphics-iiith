@@ -7,7 +7,7 @@
     <link href="Bresenhem.css" rel="stylesheet">
 </head>
 
-<body onresize="frameCreator()">
+<body>
 	<pre style="text-align: center; font-size:14pt; font-weight: bold">Rasterization: Line</pre>
 	<div class="wrapper">
 	<div class="chart" id="chart">
@@ -17,11 +17,11 @@
 		<table>
 			<tr>
 				<td>Frame Width</td>
-				<td><input type="number" value="15" id="frameWidth" name="frameWidth" min="10" max="25" onchange="frameCreator()"></td>
+				<td><input type="number" value="15" id="frameWidth" name="frameWidth" min="15" max="25" onchange="frameCreator()"></td>
 			</tr>
 			<tr>
 				<td>Frame Height</td>
-				<td><input type="number" value="15" id="frameHeight" name="frameHeight" min="10" max="25" onchange="frameCreator()"></td>
+				<td><input type="number" value="15" id="frameHeight" name="frameHeight" min="15" max="25" onchange="frameCreator()"></td>
 			</tr>
 			<tr>
 				<td>X0</td>
@@ -45,6 +45,12 @@
 			<tr>
 				<td><button id="previous" type="button" >Previous</button></td>
 				<td><button id="next" type="button" >Next</button></td>
+			</tr>
+			<tr>
+				<td colspan="2" align="center">Constraints</td>
+			</tr>
+			<tr>
+					<td colspan="2" align="center">Minimum and Maximum Frame Height and Width is 15 and 25 respectively</td>
 			</tr>
 		</table>
 	</div>
