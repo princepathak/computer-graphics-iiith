@@ -24,6 +24,7 @@ function plotLineLow(x0, y0, x1, y1) {
         coordinates[i] = {};
         coordinates[i].x = x;
         coordinates[i].y = y;
+        coordinates[i].d=D;
         if (D > 0) {
             y = y + yi;
             D = D - 2 * dx;
@@ -101,6 +102,7 @@ function plotLineHigh(x0, y0, x1, y1) {
         coordinates[i] = {};
         coordinates[i].x = x;
         coordinates[i].y = y;
+        coordinates[i].d=D;
         if (D > 0) {
             x = x + xi;
             D = D - 2 * dy;
@@ -145,6 +147,7 @@ function nextStep() {
     if (grid) {
         grid.style.fill = colors[5];
         step += 1;
+        document.getElementById("Coordinate").innerHTML="( " + Coordinates[step].x + " " + Coordinates[step].y + " )";
     }
     else {
         alert("Null");
@@ -163,10 +166,34 @@ function previousStep() {
     if (grid1) {
         grid1.style.fill = colors[0];
         step -= 1;
+        document.getElementById("Coordinate").innerHTML="( " + Coordinates[step].x + " " + Coordinates[step].y + " )";
     }
     else {
         alert("Null");
     }
+}
+function datapicker(){
+    X0 = parseInt(document.getElementById("x1").value,10);
+    X1 = parseInt(document.getElementById("x2").value,10);
+    Y0 = parseInt(document.getElementById("y1").value,10);
+    Y1 = parseInt(document.getElementById("y2").value,10);
+
+    if(Math.abs(Y1 - Y0) > frameHeight){
+        alert("Y values are out of range:\n Try enter y values with difference of less than 25");
+        return 1;
+    }
+    if(Math.abs(X1 - X0) > frameWidth){
+        alert("X values are out of range:\n Try enter x values with difference of less than 25");
+        return 1;
+    }
+    var dy = Y1 - Y0,
+        dx = X1 - X0,
+        c;
+
+    c=parseFloat(Y1*dx-dy*X1);
+    var equation= dx + "y + " + "(" + -dy + ")x + " + "(" + -c + ") = 0";
+    document.getElementById("Equation").innerHTML=equation;
+    return 0;
 }
 function frameCreator(){
     var a,b;   
@@ -181,25 +208,12 @@ function frameCreator(){
     }
     
 }
-function datapicker(){
-    var x1 = X0 = parseInt(document.getElementById("x1").value,10);
-    var x2 = X1 = parseInt(document.getElementById("x2").value,10);
-    var y1 = Y0 = parseInt(document.getElementById("y1").value,10);
-    var y2 = Y1 = parseInt(document.getElementById("y2").value,10);
 
-    if(Math.abs(y2 - y1) > frameHeight){
-        alert("Y values are out of range:\n Try enter y values with difference of less than 25");
-        return;
-    }
-    if(Math.abs(x2 - x1) > frameWidth){
-        alert("X values are out of range:\n Try enter x values with difference of less than 25");
-        return;
-    }
-}
 function drawGraph() {
     step = -1;
-    datapicker();
-    
+    if(parseInt(datapicker())){
+        return;
+    }
     data = generateXY(X0, Y0, X1, Y1);
     gridSize = data.gridSize;
 
@@ -254,6 +268,9 @@ function drawGraph() {
         });
 }
 function drawLine(){
+    if(parseInt(datapicker())){
+        return;
+    }
     var line = svg
         .append("line")
         .attr("id","line")

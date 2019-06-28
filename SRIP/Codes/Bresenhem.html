@@ -10,7 +10,7 @@
 <body>
 	<pre style="text-align: center; font-size:14pt; font-weight: bold">Rasterization: Line</pre>
 	<div class="wrapper">
-	<div class="chart" id="chart">
+	<div class="chart" id="chart" style="min-width: 400">
 
 	</div>
 	<div class="data" id="dataset-picker">
@@ -25,19 +25,19 @@
 			</tr>
 			<tr>
 				<td>X0</td>
-				<td><input type="number" value="2" id="x1" name="x1" onchange="drawLine()"></td>
+				<td><input type="number" value="2" id="x1" name="x1" ></td>
 			</tr>
 			<tr>
 				<td>Y0</td>
-				<td><input type="number" value="2" id="y1" name="y1" onchange="drawLine()"></td>
+				<td><input type="number" value="2" id="y1" name="y1" ></td>
 			</tr>
 			<tr>
 				<td>X1</td>
-				<td><input type="number" value="10" id="x2" name="x2" onchange="drawLine()"></td>
+				<td><input type="number" value="10" id="x2" name="x2" ></td>
 			</tr>
 			<tr>
 				<td>Y1</td>
-				<td><input type="number" value="10" id="y2" name="y2" onchange="drawLine()"></td>
+				<td><input type="number" value="10" id="y2" name="y2" ></td>
 			</tr>			
 			<tr>
 				<td colspan="2"><button type="button" id="submit">Run the Experiment</button></td>
@@ -47,7 +47,15 @@
 				<td><button id="next" type="button" >Next</button></td>
 			</tr>
 			<tr>
-				<td colspan="2" align="center">Constraints</td>
+				<td align="center" ><b>Equation of line</b></td>
+				<td align="center" id="Equation"></td>
+			</tr>
+			<tr>
+				<td  align="center" ><b>Chosen Coordinate</b></td>
+				<td align="center" id="Coordinate">None</td>
+			</tr>
+			<tr>
+				<td colspan="2" align="center"><b>Constraints</b></td>
 			</tr>
 			<tr>
 					<td colspan="2" align="center">Minimum and Maximum Frame Height and Width is 15 and 25 respectively</td>
